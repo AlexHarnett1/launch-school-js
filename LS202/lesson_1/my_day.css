@@ -1,0 +1,16 @@
+body {
+  margin-left: 25px;
+}
+
+ul {
+  padding-left: 0;
+  list-style-type: none;
+}
+
+#afternoon-header {
+  color: blue;
+}
+
+#evening-header {
+  color: purple;
+}
