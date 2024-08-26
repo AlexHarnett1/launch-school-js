@@ -1,0 +1,78 @@
+    html {
+      font-size: 28px;
+    }
+    
+    body {
+      border: 2px solid black;
+      font-family: Helvetica;
+      font-size: 1rem;
+      margin: 8px;
+      padding: 0px 14px;
+      width: 640px;
+    }
+
+    h1 {
+      font-family: 'Franklin Gothic Heavy', Arial;
+      font-size: 2rem;
+      margin: 8px 0 2px 0;
+    }
+
+    p {
+      margin: 0;
+      width: 100%;
+    }
+
+    h2 {
+      font-family: 'Helvetica Black', Arial;
+      font-size: 28px;
+      margin: 0;
+      padding: 8px 0 0 0;
+      font-weight: bold;
+    }
+
+    dl {
+      margin: 0;
+    }
+
+    header dl {
+      border-top: 1px solid black;
+    }
+
+    dt {
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    dd {
+      display: inline-block;
+      margin-left: 5px;
+    }
+
+    table {
+      width: 100%;
+      margin: 4px 0px;
+      padding: 0;
+      border-collapse: collapse;
+    }
+
+    th:nth-child(2) {
+      text-align: right;
+      font-weight: normal;
+    }
+
+    tbody tr, tfoot tr {
+      border-top: 1px solid black;
+    }
+
+    td{
+      padding: 0;
+    }
+
+    td:nth-child(2) {
+      text-align: right;
+      font-weight: bold;
+    }
+
+    .indent {
+      padding-left: 30px;
+    }
