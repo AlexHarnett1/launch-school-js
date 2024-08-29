@@ -1,0 +1,98 @@
+/*
+----------------------------------------
+Tantek Celik's Whitespace Reset
+     Author:    Tantek Celik, Shane Riley
+    Version:    (CC) 2010 Some Rights Reserved - http://creativecommons.org/licenses/by/2.0
+Description:  Resets default styling of browsers to a common base
+----------------------------------------
+*/
+
+ul, ol { list-style: none; }
+h1, h2, h3, h4, h5, h6, pre, code { font-size: 1em; }
+ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, body, html, p, blockquote,
+fieldset, input, dl, dt, dd, figure, figcaption {
+  margin: 0;
+  padding: 0;
+}
+a img, :link img, :visited img, fieldset { border: none; }
+address { font-style: normal; }
+header, section, article, nav, footer, hgroup, details, summary, figure, main {
+  display: block;
+}
+mark {
+  color: inherit;
+  background-color: transparent;
+}
+abbr { border: none; }
+summary::-webkit-details-marker { display: none; }
+
+body {
+  background: url("company_splash_page_assets/bg_body.gif") repeat;
+  width: 1000px;
+  margin: 160px auto;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  margin-top: 160px;
+  margin-bottom: 100px;
+}
+
+main {
+  background-color: white;
+  color: black;
+  text-align: center;
+  font-family: "Nunito Sans", Helvetica, Arial, sans-serif;;
+}
+
+h1 {
+  padding-top: 100px;
+  padding-bottom: 20px;
+  font-size: 36px;
+  font-weight: normal;
+}
+
+h2 {
+  font-size: 28px;
+  color: #3e98b2;
+  font-weight: normal;
+  padding-bottom: 25px;
+}
+
+h1::before,
+h1::after {
+  content: "\2022";
+  font-size: 36px;
+  padding: 0 26px 0 24px;
+  vertical-align: 5px;
+}
+
+p {
+  font-size: 20px;
+  margin: 0 100px;
+  padding-bottom: 45px;
+  line-height: 1.5;
+}
+
+footer {
+  background-color: grey;
+  height: 113px;
+  padding: 33px 0;
+  box-sizing: border-box;
+}
+
+ul {
+  display: flex;
+  justify-content: space-evenly;
+  list-style-type: none;
+  padding: 0 180px;
+}
+
+li {
+  display: list-item;
+}
+
+img {
+  vertical-align: middle;
+}
