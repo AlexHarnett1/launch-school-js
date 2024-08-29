@@ -1,0 +1,173 @@
+    * {
+      box-sizing: border-box;
+    }
+
+    .cf::before,
+    .cf::after {
+      content: "";
+      display: block;
+    }
+
+    .cf::after {
+      clear: both;
+    }
+
+    .anchor {
+      border: 2px dashed black;
+      padding: 20px;
+      width: 500px;
+    }
+
+    .margins>a {
+      margin: 20px;
+    }
+
+    .padding>a {
+      padding: 20px;
+      background-color: green;
+      color: white;
+    }
+
+    .floating>a {
+      margin: 15px;
+      padding: 25px;
+      text-align: center;
+      width: 120px;
+    }
+
+    .none {
+      background-color: blue;
+      color: white;
+    }
+
+    .height_padding {
+      height: 60px;
+      padding: 20px;
+      margin: 20px;
+      background-color: green;
+      color: white;
+    }
+
+    .explicit_width {
+      width: 90px;
+      background-color: orange;
+      color: white;
+    }
+
+    .height_width {
+      width: 180px;
+      height: 120px;
+      background-color: pink;
+      color: white;
+    }
+
+    .box1 {
+      background-color: blue;
+      color: white;
+      border: 1px solid orange;
+      float: left;
+    }
+
+    .box2 {
+      background-color: red;
+      color: white;
+      border: 1px solid orange;
+      float: right;
+    }
+
+    .box3 {
+      background-color: red;
+      color: white;
+      border: 1px solid orange;
+      float: left;
+      width: 40%;
+      text-align: center;
+    }
+
+    .box4 {
+      background-color: blue;
+      color: white;
+      border: 1px solid orange;
+      float: right;
+      width: 50%;
+      text-align: center;
+    }
+
+    .a_block > a{
+      display: block;
+      background-color: blue;
+      color: white;
+      margin: 20px;
+      padding: 10px;
+      text-align: center;
+
+    }
+
+    .nav_bar > nav{
+      margin: 0 2%;
+      padding: 10px 0;
+      width: 20%;
+      display: inline-block;
+      background-color: blue;
+      color: white;
+      text-align: center;
+    }
+
+    .flbx-1 {
+      background-color: tomato;
+      color: white;
+      float: left;
+      font-weight: bold;
+      height: 100px;
+      line-height: 100px;
+      text-align: center;
+      width: 450px;
+    }
+
+    .flbx-2 {
+      background-color: dodgerblue;
+      color: white;
+      float: left;
+      font-weight: bold;
+      height: 100px;
+      line-height: 100px;
+      text-align: center;
+      width: 505px;
+    }
+
+    .flbx-3 {
+      background-color: seagreen;
+      clear: both;
+      color: white;
+      font-weight: bold;
+      height: 50px;
+      line-height: 50px;
+      margin-bottom: 35px;
+      text-align: center;
+      width: 955px;
+    }
+
+    .fixed {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: blue;
+      color: white;
+    }
+
+    .relative {
+      position: relative;
+      bottom: 0;
+      left: 0;
+      background-color: red;
+      color: white;
+    }
+
+    .absolute {
+      position: absolute;
+      bottom: 40px;
+      left: 80px;
+      background-color: green;
+      color: white;
+    }
+
