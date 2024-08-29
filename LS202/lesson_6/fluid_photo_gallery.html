@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>your page title goes here</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background-color: #151515;
+      color: #f0f0f0;
+      font: normal 16px Helvetica, Arial, sans-serif;
+    }
+
+    main {
+      background-color: #333;
+      color: inherit; /* #f0f0f0 */
+      box-sizing: border-box;
+      display: block;
+      margin: 0 auto;
+      max-width: 1000px;
+      padding: 25px 20px 20px;
+    }
+
+    h1 {
+      margin: 1.33rem 0;
+      text-align: center;
+    }
+
+    img {
+      box-sizing: border-box;
+      display: block;
+      height: auto;
+      width: 100%;
+    }
+
+    figure {
+      margin: 0;
+      padding: 0 0 30px;
+    }
+
+    figure img {
+      border: 15px solid white;
+    }
+
+    figcaption {
+      display: block;
+      padding: 10px 0 0;
+    }
+
+    ul {
+      font-size: 0;
+      margin: 0 -15px;
+      padding: 0;
+    }
+
+    li {
+      box-sizing: border-box;
+      display: inline-block;
+      margin-bottom: 30px;
+      padding: 0 15px;
+      vertical-align: top;
+      width: 25%;
+    }
+
+    li img {
+      border: 3px solid white;
+    }
+    @media screen and (max-width: 900px) {
+      li {
+        width: 33%
+      }
+    }
+    @media screen and (max-width: 600px) {
+      li {
+        width: 50%
+      }
+    }
+
+    @media screen and (min-width: 1280px) {
+      main {
+        max-width: 100%;
+      }
+
+      figure {
+        display: inline-block;
+        float: left;
+        margin-right: 50px;
+        vertical-align: top;
+        width: 950px;
+      }
+
+      ul {
+        overflow: hidden;
+      }
+
+      li {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+  <body>
+    <main>
+      <h1>My Photo Gallery</h1>
+      <figure>
+        <img src="https://via.placeholder.com/1200x900" alt="">
+        <figcaption>Example photo</figcaption>
+      </figure>
+      <ul>
+        <li>
+          <img src="https://via.placeholder.com/1200x900" alt="Photo 1">
+        </li>
+        <li>
+          <img src="https://via.placeholder.com/1200x900" alt="Photo 2">
+        </li>
+        <li>
+          <img src="https://via.placeholder.com/1200x900" alt="Photo 3">
+        </li>
+        <li>
+          <img src="https://via.placeholder.com/1200x900" alt="Photo 4">
+        </li>
+        <li>
+          <img src="https://via.placeholder.com/1200x900" alt="Photo 5">
+        </li>
+        <li>
+          <img src="https://via.placeholder.com/1200x900" alt="Photo 6">
+        </li>
+        <li>
+          <img src="https://via.placeholder.com/1200x900" alt="Photo 7">
+        </li>
+      </ul>
+    </main>
+  </body>
+
+</html>
+
