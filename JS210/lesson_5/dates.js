@@ -2,7 +2,7 @@ let today = new Date();
 let daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-let dayOfWeek = daysOfWeek[today.getDay()]
+let dayOfWeek = daysOfWeek[today.getDay()];
 let dayOfMonth = today.getDate();
 let month = months[today.getMonth()];
 
@@ -12,7 +12,7 @@ if (String(dayOfMonth)[0] !== '1') {
     suffix = 'st';
   } else if (dayOfMonth % 10 === 2) {
     suffix = 'nd';
-  } else if (dayOfMonth % 10 === 3) { 
+  } else if (dayOfMonth % 10 === 3) {
     suffix = 'rd';
   }
 }
