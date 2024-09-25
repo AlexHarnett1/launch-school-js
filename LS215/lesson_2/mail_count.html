@@ -1,0 +1,25 @@
+<script src="https://dbdwvr6p7sskw.cloudfront.net/210/files/email_data_v2.js"></script>
+<script>
+  function mailCount(emailData) {
+      let emails = emailData.split('##||##');
+      let sections = emails.map(email => email.split('#/#'));
+      let maxDate = sections.reduce((max, section) => section[2] > max ? section[2] : max, sections[0][2]);
+      let minDate = sections.reduce((min, section) => section[2] < min ? section[2] : min, sections[0][2]);
+
+      minDate = convertDate(minDate.trim().split(':')[1]);
+      maxDate = convertDate(maxDate.trim().split(':')[1])
+      console.log(`Count of Email: ${emails.length}`);
+      console.log(`Date Range: ${minDate} - ${maxDate}`);
+
+    }
+  function convertDate (date) {
+    let dateObj = new Date(date.split('-').join('/'));
+    return dateObj.toDateString();
+  }
+    mailCount(emailData);
+  
+// console output
+
+// Count of Email: 5
+// Date Range: Sat Jun 25 2016 - Thu Aug 11 2016
+</script>
