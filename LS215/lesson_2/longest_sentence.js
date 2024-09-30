@@ -29,8 +29,8 @@ let longText = 'Four score and seven years ago our fathers brought forth' +
   ' earth.';
 
 function longestSentence(text) {
-  let sentences = text.split(/([\.\?!])/);
-
+  let sentences = text.split(/([\.\?!])/).filter(sentence => sentence.trim() !== '');
+  console.log(sentences);
   let combinedSentences = [];
   for (let i = 0; i < sentences.length; i += 2) {
     let sentence = sentences[i].trim();
@@ -39,7 +39,9 @@ function longestSentence(text) {
   }
 
   let sentencesSplit = combinedSentences.map(sentence => sentence.split(' '));
+  console.log(sentencesSplit);
   let longestSentenceArray = findLongestArray(sentencesSplit);
+  console.log(longestSentenceArray);
 
   console.log(longestSentenceArray.join(' '));
   console.log(`The longest sentence has ${longestSentenceArray.length} words.`)
@@ -51,8 +53,9 @@ function findLongestArray(array) {
   }, array[0]);
 }
 
-longestSentence(longText);
+//longestSentence(longText);
 
+longestSentence('Hello \n world');
 // console output
 // It is rather for us to be here dedicated to the great task remaining before us-- that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion-- that we here highly resolve that these dead shall not have died in vain-- that this nation, under God, shall have a new birth of freedom-- and that government of the people, by the people, for the people, shall not perish from the earth.
 
