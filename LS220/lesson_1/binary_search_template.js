@@ -1,3 +1,5 @@
+/*
+
 let left = 0;
 let right = array.length - 1;
 
@@ -12,6 +14,8 @@ while (left <= right) {
     right = mid - 1;
   }
 }
+
+*/
 
 // Most often, if the target is not found, additional handling
 // or returning a specific value is needed. In many cases it will
