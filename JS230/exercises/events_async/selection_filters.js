@@ -10,7 +10,7 @@ classificationMenu.addEventListener('change', (event) => {
   let classificationOption = classificationMenu.querySelector(`option[value='${classificationOptionValue}']`);
   console.log(classificationOption);
   classificationOption.selected = true;
-  hideAnimalOptions(classificationOptionValue);
+  hideAnimalOptions(classificationOptionValue); 
 });
 
 animalMenu.addEventListener('change', (event) => {
