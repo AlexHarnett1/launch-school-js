@@ -1,0 +1,36 @@
+body {
+  background-color: #355;
+}
+
+h1 {
+  color: white;
+  text-align: center;
+}
+
+section {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+img {
+  border: 10px;
+  border-style: solid;
+  border-color: white;
+  border-radius: 10px;
+  width:100%;
+  height: auto;
+}
+
+figure {
+  margin: 20px;
+}
+
+figcaption {
+  display: none;
+  color: white;
+}
+
+figcaption.show {
+  display:block;
+}
