@@ -1,0 +1,30 @@
+body {
+  background-color: #355; 
+}
+
+h1 {
+  color: white;
+  text-align: center;
+}
+
+/* h2 {
+  text-align: center;
+} */
+
+#languages_descriptions {
+  color: black;
+  background-color: white;
+  width: 50%;
+  margin-left: 24%;
+  padding: 1%;
+
+  border-style: solid;
+  border-color: white;
+  border-radius: 5px;
+}
+
+button {
+  background-color: #355;
+  color: white;
+  border-radius: 5px;
+}
