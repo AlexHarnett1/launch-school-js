@@ -1,9 +1,9 @@
+import { UIManager } from "./ui_manager.js";
 import { APIManager } from "./api_manager.js";
 import { Todo } from "./todo.js";
 
 class TodoManager {
   constructor() {
-    this.templates = {};
     this.apiManager = new APIManager();
     this.todos = null;
     this.templateData = {};
@@ -12,26 +12,16 @@ class TodoManager {
     // Store currently selected group
     this.currentGroupTitle = "All Todos";
     this.isCompletedGroup = false;
-    
+
+    // Create instance of UIManager
+    this.uiManager = new UIManager(this.templateData);
+
     this.init();
   }
 
   async init() {
-    this.registerTemplates();
     await this.loadTodos();
     this.createEventListeners();
-  }
-
-  registerTemplates() {
-    document.querySelectorAll("script[type='text/x-handlebars']").forEach(tmpl => {
-      this.templates[tmpl["id"]] = Handlebars.compile(tmpl["innerHTML"]);
-    });
-
-    document.querySelectorAll('[data-type=partial]').forEach(tmpl => {
-      Handlebars.registerPartial(tmpl["id"], tmpl["innerHTML"]);
-    });
-
-    console.log(this.templates);
   }
 
   async loadTodos() {
@@ -39,12 +29,7 @@ class TodoManager {
     this.todos = apiTodos.map(todo => new Todo(todo));
     this.updateTemplateData();
     this.setTemplateGroup(false, "All Todos");
-    this.renderMainTemplate();
-  }
-
-  renderMainTemplate() {
-    document.querySelector('body').insertAdjacentHTML('beforeend', this.templates.main_template(this.templateData));
-    document.getElementById('all_header').classList.add('active');
+    this.uiManager.renderMainTemplate(this.templateData);
   }
 
   updateTemplateData() {
@@ -52,10 +37,8 @@ class TodoManager {
     let done = this.todos.filter(todo => todo.completed);
     let todos_by_date = this.groupTodosByDate(this.todos);
     let done_todos_by_date = this.groupTodosByDate(done);
-    //let current_section = { title: "All Todos", data: this.todos.length };
-    //let selected = this.todos;
     Object.assign(this.templateData, { todos: this.todos, done, todos_by_date, done_todos_by_date });
-    //this.refreshTemplateGroup();
+    console.log(this.templateData);
   }
 
   sortTodos() {
@@ -70,14 +53,12 @@ class TodoManager {
   addTodoToTemplateData(todoJson) {
     let todo = new Todo(todoJson);
     this.todos.push(todo);
-    // This could be done manually to be more efficient memory wise, but not concerned atm.
     this.updateTemplateData();
     this.setTemplateGroup(false, 'All Todos');
-    this.updateUI();
+    this.uiManager.updateUI();
   }
 
   removeTodoFromTemplateData(todoId) {
-    console.log(todoId);
     this.todos = this.todos.filter(todo => todo.id !== Number(todoId));
     this.updateTemplateData();
     this.refreshTemplateGroup();
@@ -91,88 +72,54 @@ class TodoManager {
   }
 
   updateUI() {
-    this.updateTitleUI();
-    this.updateItemsUI();
-    this.updateSideBarUI();
-  }
-
-  updateTitleUI() {
-    const headerContainer = document.querySelector('#items').firstElementChild;
-    console.log(headerContainer);
-    console.log(this.templateData);
-    headerContainer.innerHTML = this.templates.title_template(this.templateData);
-  }
-
-  updateItemsUI() {
-    const listContainer = document.querySelector('tbody');
-    listContainer.innerHTML = this.templates.list_template(this.templateData);  
-  }
-
-  updateSideBarUI() {
-    const activeElement = document.querySelector('.active');
-    const activeTitle = activeElement?.getAttribute('data-title');
-
-    const allListsContainer = document.querySelector('#all_lists');
-    allListsContainer.innerHTML = this.templates.all_list_template(this.templateData);
-
-    const allTodosContainer = document.querySelector('#all_todos');
-    allTodosContainer.innerHTML = this.templates.all_todos_template(this.templateData);
-
-    const completedListsContainer = document.querySelector('#completed_lists');
-    completedListsContainer.innerHTML = this.templates.completed_list_template(this.templateData);
-
-    const completedTodosContainer = document.querySelector('#completed_todos');
-    completedTodosContainer.innerHTML = this.templates.completed_todos_template(this.templateData);
-
-    // Maintain active sidebar element after refreshing the sidebar
-    const newActiveElementParent = this.isCompletedGroup ? document.getElementById('completed_items') : document.getElementById('all');
-    const newActiveElement = newActiveElementParent.querySelector(`[data-title="${activeTitle}"]`);
-    newActiveElement?.classList.add('active');
+    this.uiManager.updateTitleUI(this.templateData);
+    this.uiManager.updateItemsUI(this.templateData);
+    this.uiManager.updateSideBarUI(this.isCompletedGroup, this.templateData);
   }
 
   groupTodosByDate(todos) {
     let obj = {};
+
+    // Group todos by due date
     todos.forEach(todo => {
-      if (obj[todo.due_date]) {
-        obj[todo.due_date].push(todo);
-      } else {
-        obj[todo.due_date] = [todo];
+      let dueDate = todo.due_date;
+      if (!obj[dueDate]) {
+        obj[dueDate] = [];
       }
+      obj[dueDate].push(todo);
     });
-    return obj;
+
+    // Convert to array for sorting while keeping it as key-value pairs
+    let sortedObj = Object.entries(obj)
+      .sort(([dateA], [dateB]) => {
+        if (dateA === "No Due Date") return -1;
+        if (dateB === "No Due Date") return 1;
+        return new Date(dateA) - new Date(dateB);
+      });
+
+    // Convert back to an object
+    return Object.fromEntries(sortedObj);
   }
 
   toggleModal() {
-    // Need to add a top margin to center it on the page when it is brought up.
-    document.querySelectorAll('div.modal').forEach(modal => {
-      modal.style.display = modal.style.display === 'none' || !modal.style.display ? 'block' : 'none';
-    });
-    document.getElementById('form_modal').firstElementChild.reset(); //Might need to change this... It resets toggling on and off.
+    this.uiManager.toggleModal();
   }
 
   populateModalFields(todoId) {
     this.modalTodoId = todoId;
     let todo = this.findTodoById(todoId);
-    let modalForm = document.getElementById('form_modal').firstElementChild;
-
-    modalForm.querySelector('#title').value = todo.title;
-    if (todo.day) modalForm.querySelector('#due_day').value = todo.day;
-    if (todo.month) modalForm.querySelector('#due_month').value = todo.month;
-    if (todo.year) modalForm.querySelector('#due_year').value = todo.year;
-    modalForm.querySelector('textarea').value = todo.description;
+    this.uiManager.populateModalFields(todo);
   }
 
   createEventListeners() {
     let modalForm = document.getElementById('form_modal').firstElementChild;
     let todoTable = document.querySelector('table');
 
-    // Bring up modal for new todo
     document.querySelector("label[for=new_item]").addEventListener('click', (e) => {
       this.toggleModal();
       this.modalTodoId = null;
     });
 
-    // Add or update a Todo
     modalForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       let todoFormData = Object.fromEntries(new FormData(e.target).entries());
@@ -193,7 +140,6 @@ class TodoManager {
       this.toggleModal();
     });
 
-    // Mark todo as complete
     modalForm.querySelector("button[name='complete']").addEventListener('click', async (e) => {
       e.preventDefault();
       if (this.modalTodoId) {
@@ -214,44 +160,39 @@ class TodoManager {
       this.toggleModal();
     });
 
-    // Click on a todo
     todoTable.addEventListener('click', async (e) => {
       e.preventDefault();
-      console.log(e.target);
 
-      //Delete todo
       const deleteButton = e.target.closest('.delete');
       let id = e.target.closest('tr').getAttribute('data-id');
       if (deleteButton) {
         await this.apiManager.deleteTodo(id);
         this.removeTodoFromTemplateData(id);
-      } else if (e.target.tagName === 'LABEL') { // Bring up modal for updating todo
+      } else if (e.target.tagName === 'LABEL') {
         this.toggleModal();
         this.populateModalFields(id);
-      } else {                                  // Mark todo completed
+      } else {
         let todo = this.findTodoById(id);
         todo.toggleCompleted();
         await this.apiManager.toggleTodoComplete(todo);
         this.updateTemplateData();
         this.refreshTemplateGroup();
       }
-
     });
 
     document.getElementById('sidebar').addEventListener('click', (e) => {
       e.preventDefault();
 
       let target = e.target.closest('[data-title]');
-      if (!target) return; // Ensure target exists
+      if (!target) return;
 
-      document.querySelector('.active')?.classList.remove('active'); // Remove previously active class safely
+      document.querySelector('.active')?.classList.remove('active');
       target.classList.add('active');
 
       const isCompleted = e.target.closest('#completed_items') !== null;
       this.setTemplateGroup(isCompleted, target.getAttribute('data-title'));
       this.updateUI();
     });
-
   }
 
   setTemplateGroup(isCompleted, date) {
@@ -272,9 +213,8 @@ class TodoManager {
       this.templateData.current_section = { title: date, data: 0 };
       this.templateData.selected = {};
     }
-    
   }
-  
+
   refreshTemplateGroup() {
     this.setTemplateGroup(this.isCompletedGroup, this.currentGroupTitle);
     this.updateUI();
@@ -286,8 +226,9 @@ class TodoManager {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  let todoManager = new TodoManager();
-});
+  const todoManager = new TodoManager();
+})
+
 
 
 /*
