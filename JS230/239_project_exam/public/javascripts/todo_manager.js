@@ -5,15 +5,13 @@ import { Todo } from "./todo.js";
 class TodoManager {
   constructor() {
     this.apiManager = new APIManager();
-    this.todos = null;
+    this.todos = [];
     this.templateData = {};
     this.modalTodoId = null;
 
     // Store currently selected group
     this.currentGroupTitle = "All Todos";
-    this.isCompletedGroup = false;
-
-    // Create instance of UIManager
+    this.isCurrentGroupCompleted = false;
     this.uiManager = new UIManager(this.templateData);
 
     this.init();
@@ -25,11 +23,17 @@ class TodoManager {
   }
 
   async loadTodos() {
-    const apiTodos = await this.apiManager.getAllTodos();
-    this.todos = apiTodos.map(todo => new Todo(todo));
-    this.updateTemplateData();
-    this.setTemplateGroup(false, "All Todos");
-    this.uiManager.renderMainTemplate(this.templateData);
+    try {
+      const apiTodos = await this.apiManager.getAllTodos();
+      this.todos = apiTodos.map(todo => new Todo(todo));
+      this.updateTemplateData();
+      this.setTemplateGroup(false, "All Todos");
+      this.uiManager.renderMainTemplate(this.templateData);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to load todos. Please try again later.");
+    }
+    
   }
 
   updateTemplateData() {
@@ -38,7 +42,6 @@ class TodoManager {
     let todos_by_date = this.groupTodosByDate(this.todos);
     let done_todos_by_date = this.groupTodosByDate(done);
     Object.assign(this.templateData, { todos: this.todos, done, todos_by_date, done_todos_by_date });
-    console.log(this.templateData);
   }
 
   sortTodos() {
@@ -54,27 +57,26 @@ class TodoManager {
     let todo = new Todo(todoJson);
     this.todos.push(todo);
     this.updateTemplateData();
-    this.setTemplateGroup(false, 'All Todos');
-    this.uiManager.updateUI();
+
+    let sideBarElement = document.getElementById('all_header');
+    this.setActiveSideBarElement(sideBarElement);
   }
 
   removeTodoFromTemplateData(todoId) {
     this.todos = this.todos.filter(todo => todo.id !== Number(todoId));
-    this.updateTemplateData();
     this.refreshTemplateGroup();
   }
 
   updateTodoTemplateData(todoJson) {
     let todo = this.findTodoById(todoJson.id);
     todo.setAllTodoVariables(todoJson);
-    this.updateTemplateData();
     this.refreshTemplateGroup();
   }
 
   updateUI() {
     this.uiManager.updateTitleUI(this.templateData);
     this.uiManager.updateItemsUI(this.templateData);
-    this.uiManager.updateSideBarUI(this.isCompletedGroup, this.templateData);
+    this.uiManager.updateSideBarUI(this.isCurrentGroupCompleted, this.templateData);
   }
 
   groupTodosByDate(todos) {
@@ -112,14 +114,24 @@ class TodoManager {
   }
 
   createEventListeners() {
-    let modalForm = document.getElementById('form_modal').firstElementChild;
-    let todoTable = document.querySelector('table');
+    this.setupModalListeners();
+    this.setupTodoTableListeners();
+    this.setupSideBarListeners();
+  }
 
+  setupModalListeners() {
+    let modalForm = document.getElementById('form_modal').firstElementChild;
+
+    // Open modal on click "Add new modal"
     document.querySelector("label[for=new_item]").addEventListener('click', (e) => {
       this.toggleModal();
       this.modalTodoId = null;
     });
 
+    // Close modal when clicking space outside of modal.
+    document.getElementById('modal_layer').addEventListener('click', () => this.toggleModal());
+
+    // Submit modal form
     modalForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       let todoFormData = Object.fromEntries(new FormData(e.target).entries());
@@ -128,27 +140,35 @@ class TodoManager {
         alert('The title must be at least 3 characters.');
         return;
       }
-
-      todoFormData = Todo.sanitizeFormData(todoFormData);
-      if (this.modalTodoId) {
-        let todoJson = await this.apiManager.updateTodo(todoFormData, this.modalTodoId);
-        this.updateTodoTemplateData(todoJson);
-      } else {
-        let todoJson = await this.apiManager.createTodo(todoFormData);
-        this.addTodoToTemplateData(todoJson);
+      try {
+        todoFormData = Todo.sanitizeFormData(todoFormData);
+        if (this.modalTodoId) {
+          let todoJson = await this.apiManager.updateTodo(todoFormData, this.modalTodoId);
+          this.updateTodoTemplateData(todoJson);
+        } else {
+          let todoJson = await this.apiManager.createTodo(todoFormData);
+          this.addTodoToTemplateData(todoJson);
+        }
+      } catch (error) {
+        console.error("Error submitting todo:", error);
+        alert("Failed to save the todo. Please try again.");
       }
       this.toggleModal();
     });
 
+    // Mark as complete selected 
     modalForm.querySelector("button[name='complete']").addEventListener('click', async (e) => {
       e.preventDefault();
       if (this.modalTodoId) {
         let todo = this.findTodoById(this.modalTodoId);
         if (!todo.completed) {
           todo.toggleCompleted();
-          await this.apiManager.toggleTodoComplete(todo);
+          try {
+            await this.apiManager.toggleTodoComplete(todo);
+          } catch (error) {
+            console.log(error);
+          }
         }
-        this.updateTemplateData();
         this.refreshTemplateGroup();
         this.toggleModal();
       } else {
@@ -156,48 +176,73 @@ class TodoManager {
       }
     });
 
-    document.getElementById('modal_layer').addEventListener('click', (e) => {
-      this.toggleModal();
-    });
+  }
 
+  setupTodoTableListeners() {
+    let todoTable = document.querySelector('table');
+
+    // Handle todos being clicked(deletion, open modal, mark completed)
     todoTable.addEventListener('click', async (e) => {
       e.preventDefault();
 
       const deleteButton = e.target.closest('.delete');
       let id = e.target.closest('tr').getAttribute('data-id');
-      if (deleteButton) {
-        await this.apiManager.deleteTodo(id);
-        this.removeTodoFromTemplateData(id);
-      } else if (e.target.tagName === 'LABEL') {
+      if (deleteButton) {                        // Delete todo
+        await this.deleteTodo(id);
+      } else if (e.target.tagName === 'LABEL') { // Open modal
         this.toggleModal();
         this.populateModalFields(id);
-      } else {
-        let todo = this.findTodoById(id);
-        todo.toggleCompleted();
-        await this.apiManager.toggleTodoComplete(todo);
-        this.updateTemplateData();
-        this.refreshTemplateGroup();
+      } else {                                   // Toggle completion
+        try {
+          let todo = this.findTodoById(id);
+          todo.toggleCompleted();
+          await this.apiManager.toggleTodoComplete(todo);
+          this.refreshTemplateGroup();
+        } catch (error) {
+          console.error("Error toggling todo completion:", error);
+          alert("Failed to update the todo status. Please try again.");
+        }
       }
     });
 
-    document.getElementById('sidebar').addEventListener('click', (e) => {
+  }
+
+  async deleteTodo(id) {
+    try {
+      await this.apiManager.deleteTodo(id);
+      this.removeTodoFromTemplateData(id);
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+      alert("Failed to delete the todo. Please try again.");
+    }
+  }
+
+  setupSideBarListeners() {
+    let sidebar = document.getElementById('sidebar');
+
+    // Handle sidebar click events (Changing Active sidebar element)
+    sidebar.addEventListener('click', (e) => {
       e.preventDefault();
 
       let target = e.target.closest('[data-title]');
       if (!target) return;
 
-      document.querySelector('.active')?.classList.remove('active');
-      target.classList.add('active');
-
-      const isCompleted = e.target.closest('#completed_items') !== null;
-      this.setTemplateGroup(isCompleted, target.getAttribute('data-title'));
-      this.updateUI();
+      this.setActiveSideBarElement(target);
     });
+  }
+
+  setActiveSideBarElement(target) {
+    document.querySelector('.active')?.classList.remove('active');
+    target.classList.add('active');
+
+    const isCompleted = target.closest('#completed_items') !== null;
+    this.setTemplateGroup(isCompleted, target.getAttribute('data-title'));
+    this.updateUI();
   }
 
   setTemplateGroup(isCompleted, date) {
     this.currentGroupTitle = date;
-    this.isCompletedGroup = isCompleted;
+    this.isCurrentGroupCompleted = isCompleted;
 
     let todos;
     if (isCompleted) {
@@ -206,17 +251,13 @@ class TodoManager {
       todos = date === 'All Todos' ? this.todos : this.templateData.todos_by_date[date]
     }
 
-    if (todos) {
-      this.templateData.current_section = { title: date, data: todos.length };
-      this.templateData.selected = todos;
-    } else {
-      this.templateData.current_section = { title: date, data: 0 };
-      this.templateData.selected = {};
-    }
+    this.templateData.current_section = { title: date, data: todos ? todos.length : 0 };
+    this.templateData.selected = todos || {};
   }
 
   refreshTemplateGroup() {
-    this.setTemplateGroup(this.isCompletedGroup, this.currentGroupTitle);
+    this.updateTemplateData();
+    this.setTemplateGroup(this.isCurrentGroupCompleted, this.currentGroupTitle);
     this.updateUI();
   }
 
@@ -227,44 +268,4 @@ class TodoManager {
 
 document.addEventListener('DOMContentLoaded', () => {
   const todoManager = new TodoManager();
-})
-
-
-
-/*
-Don't forget about these:
- - Add try/catch to await statements.
- - Make it so this.updateTemplateData() and this.updateUI() are grouped.. They're always called together.
- - Consider simplifying mark completed so that it's just changing the ui that it impacts, not all of it.
- - Abstract some of the functionality of the event listeners to functions.
- - consider a more optimal way of sorting todos. (SortTodos())
- - The side bar needs to have an order.
-
-
-*/
-
-// const data = {
-//   todos: [
-//     { id: 1, title: "Buy groceries", due_date: "2025-01-16", completed: false, description: 'Hello my name is' },
-//     { id: 2, title: "Run 5 miles", due_date: "2025-01-17", completed: true }
-//   ],
-//   done: [
-//     { id: 2, title: "Run 5 miles", due_date: "2025-01-17", completed: true }
-//   ],
-//   todos_by_date: {
-//     "2025-01-16": [{ id: 1, title: "Buy groceries", due_date: "2025-01-16", completed: false }],
-//     "2025-01-17": [{ id: 2, title: "Run 5 miles", due_date: "2025-01-17", completed: true }]
-//   },
-//   done_todos_by_date: {
-//     "2025-01-17": [{ id: 2, title: "Run 5 miles", due_date: "2025-01-17", completed: true }]
-//   },
-//   current_section: {
-//     title: "All Todos",
-//     data: "2"
-//   },
-//   selected: [
-//     { id: 1, title: "Buy groceries", due_date: "2025-01-16", completed: false },
-//     { id: 2, title: "Run 5 miles", due_date: "2025-01-17", completed: true }
-//   ]
-
-// };
+});

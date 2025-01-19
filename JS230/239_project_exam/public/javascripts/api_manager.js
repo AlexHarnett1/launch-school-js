@@ -1,7 +1,4 @@
 export class APIManager {
-  constructor() {
-
-  }
 
   async getAllTodos() {
     let response = await fetch('api/todos/');

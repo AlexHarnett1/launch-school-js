@@ -54,7 +54,14 @@ export class UIManager {
     document.querySelectorAll('div.modal').forEach(modal => {
       modal.style.display = modal.style.display === 'none' || !modal.style.display ? 'block' : 'none';
     });
+    this.updateModalTopPosition(document.getElementById('form_modal'));
     document.getElementById('form_modal').firstElementChild.reset();
+  }
+
+  updateModalTopPosition(modal) {
+    const topMargin = 200 + window.scrollY;
+
+    modal.style.top = `${topMargin}px`;
   }
 
   populateModalFields(todo) {
