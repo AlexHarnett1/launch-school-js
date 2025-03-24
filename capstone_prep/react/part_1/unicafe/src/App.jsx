@@ -1,3 +1,4 @@
+import { log } from 'handlebars'
 import { useState } from 'react'
 
 const Button = ({onClick, text}) => {
@@ -29,7 +30,7 @@ const AllStatistics = (props) => {
 
 const Statistic = ({ text, stat }) => {
   stat = stat % 1 === 0 ? stat : stat.toFixed(1);
-  
+
   return (
     <tr>
       <td>{text}</td>
