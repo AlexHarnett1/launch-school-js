@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import phonebookService from '../services/phonebook';
 
-const Persons = ({ persons, filterName }) => {
+const Persons = ({ persons, filterName, onDeletePerson }) => {
   let filteredPersons = filterName === '' ? persons : persons.filter(person => (
     person.name.toLowerCase().includes(filterName.toLowerCase()))
   );
 
-  let allPersons = filteredPersons.map(person => <Person key={person.id} person={person} />)
+  let allPersons = filteredPersons.map(person => (
+    <Person key={person.id} person={person} onDeletePerson={() => onDeletePerson(person.id)} />)
+  )
 
   return (
     <ul>
@@ -15,8 +17,11 @@ const Persons = ({ persons, filterName }) => {
   )
 }
 
-const Person = ({person}) => {
-  return (<li>{person.name} {person.number}</li>)
+const Person = ({person, onDeletePerson}) => {
+  return (
+    <li>
+      {person.name} {person.number} <button onClick={onDeletePerson}>Delete</button>
+    </li>)
 }
 
 const Filter = ({newFilterName, handleFilterNameChange}) => {
@@ -50,12 +55,8 @@ const App = () => {
   const [newFilterName, setNewFilterName] = useState('')
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise sucessful')
-        setPersons(response.data)
+    phonebookService.getAll().then(initialPersons => {
+      setPersons(initialPersons)
     })
   }, [])
 
@@ -81,11 +82,21 @@ const App = () => {
     let person = {
       name: newName,
       number: newNumber,
-      id: Math.max(...persons.map(p => p.id), 0) + 1
     }
-    setPersons(persons.concat(person))
-    setNewName('')
-    setNewNumber('')
+
+    phonebookService.create(person).then(returnedPerson => {
+      setPersons(persons.concat(returnedPerson))
+      setNewName('')
+      setNewNumber('')
+    })
+  }
+
+  function onDeletePerson(id) {
+    console.log(id)
+    phonebookService.deletePerson(id).then(response => {
+      console.log(response)
+      setPersons(persons.filter(person => person.id !== id))
+    })
   }
 
   return (
@@ -97,7 +108,8 @@ const App = () => {
        newNumber={newNumber} handleNumberChange={handleNumberChange}
        onNameSubmitted={onNameSubmitted} />
       <h2>Numbers</h2>
-      <Persons persons={persons} filterName={newFilterName} />
+      <Persons persons={persons} filterName={newFilterName}
+        onDeletePerson={onDeletePerson} />
     </div>
   )
 }
