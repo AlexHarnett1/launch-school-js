@@ -4,7 +4,7 @@ const Courses = ({ courses }) => {
   console.log('courses:', courses)
   let courses_content = courses.map(course => (
     <div key={course.id}>
-      <Course course = {course} />
+      <Course key={course.id} course = {course} />
     </div>
   ))
 
