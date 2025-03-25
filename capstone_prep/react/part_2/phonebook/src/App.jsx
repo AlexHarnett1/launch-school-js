@@ -18,6 +18,30 @@ const Person = ({person}) => {
   return (<li>{person.name} {person.number}</li>)
 }
 
+const Filter = ({newFilterName, handleFilterNameChange}) => {
+  return (
+    <form>
+      <div>
+        filter shown with: <input value={newFilterName} onChange={handleFilterNameChange} />
+      </div>
+    </form>
+  )
+}
+
+const PersonForm = (props) => {
+  return (
+    <form onSubmit={props.onNameSubmitted}>
+      <div>
+        name: <input value={props.newName} onChange={props.handleNameChange} />
+        PhoneNumber: <input value={props.newNumber} onChange={props.handleNumberChange} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456', id: 1 },
@@ -28,8 +52,6 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilterName, setNewFilterName] = useState('')
-
-
 
   function handleNameChange(event) {
     setNewName(event.target.value)
@@ -53,7 +75,7 @@ const App = () => {
     let person = {
       name: newName,
       number: newNumber,
-      id: persons.length
+      id: Math.max(...persons.map(p => p.id), 0) + 1
     }
     setPersons(persons.concat(person))
     setNewName('')
@@ -63,21 +85,11 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <form>
-        <div>
-          filter shown with: <input value={newFilterName} onChange={handleFilterNameChange} />
-        </div>
-      </form>
+      <Filter newFilterName={newFilterName} handleFilterNameChange={handleFilterNameChange} />
       <h2>Add a new</h2>
-      <form onSubmit={onNameSubmitted}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-          PhoneNumber: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm newName={newName} handleNameChange={handleNameChange}
+       newNumber={newNumber} handleNumberChange={handleNumberChange}
+       onNameSubmitted={onNameSubmitted} />
       <h2>Numbers</h2>
       <Persons persons={persons} filterName={newFilterName} />
     </div>
