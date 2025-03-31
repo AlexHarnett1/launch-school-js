@@ -20,9 +20,19 @@ app.get('/api/notes', (request, response) => {
 
 // Get a single resource by id
 app.get('/api/notes/:id', (request, response) => {
-  Note.findById(request.params.id).then(note => {
-    response.json(note)
-  })
+  Note.findById(request.params.id)
+    .then(note => {
+      if (note) {
+        response.json(note)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => {
+      console.log(error)
+
+      response.status(400).send({ error: 'malformatted id' })
+    })
 })
 
 // Delete a resource by id
@@ -31,13 +41,6 @@ app.delete('/api/notes/:id', (request, response) => {
     response.status(204).end()
   })
 })
-
-const generateId = () => {
-  const maxId = notes.length > 0
-    ? Math.max(...notes.map(n => Number(n.id)))
-    : 0
-  return String(maxId + 1)
-}
 
 // Create a new note
 app.post('/api/notes', (request, response) => {
