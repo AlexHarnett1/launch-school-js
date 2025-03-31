@@ -30,16 +30,43 @@ app.get('/api/notes/:id', (request, response) => {
     })
     .catch(error => {
       console.log(error)
-
       response.status(400).send({ error: 'malformatted id' })
     })
 })
 
 // Delete a resource by id
 app.delete('/api/notes/:id', (request, response) => {
-  Note.findByIdAndDelete(request.params.id).then(note => {
+  Note.findByIdAndDelete(request.params.id)
+    .then(note => {
     response.status(204).end()
-  })
+    })
+    .catch(error => {
+      console.log(error)
+      response.status(400).send({ error: 'malformatted id' })
+    })
+})
+
+// Update a resource by id
+app.put('/api/notes/:id', (request, response) => {
+  const { content, important } = request.body
+
+  Note.findById(request.params.id)
+    .then(note => {
+      if (!note) {
+        return response.status(404).end()
+      }
+
+      note.content = content
+      note.important = important
+
+      return note.save().then((updatedNote) => {
+        response.json(updatedNote)
+      })
+    })
+    .catch(error => {
+      console.log(error)
+      response.status(400).send({ error: 'malformatted id' })
+    })
 })
 
 // Create a new note
