@@ -1,4 +1,4 @@
 export interface TOC {
-  book: String,
-  chapters: String[]
+  book: string,
+  chapters: string[]
 }
